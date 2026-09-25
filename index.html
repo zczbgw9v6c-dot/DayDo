@@ -5,26 +5,28 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="theme-color" content="#0A0E1C">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0E1C'/%3E%3Cpath d='M18 34l10 10 18-22' fill='none' stroke='%234FE3C1' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0E1C'/%3E%3Cpath d='M18 34l10 10 18-22' fill='none' stroke='%234FE3C1' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#080C18">
+<link rel="icon" type="image/png" href="icon-512.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-title" content="Daydo">
+<meta name="application-name" content="Daydo">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
 </body>
 </html>
-<title>Fil du jour</title>
+<title>Daydo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;600;700;800&display=swap">
 <style>
 :root{
   color-scheme:dark;
-  --bg:#0A0E1C; --surface:#111730; --surface-2:#18203D; --surface-3:#1F2A4D; --line:#26305A;
+  --bg:#080C18; --surface:#111730; --surface-2:#18203D; --surface-3:#1F2A4D; --line:#26305A;
   --text:#EEF1FA; --muted:#98A3C7; --faint:#5F6A92;
-  --accent:#4FE3C1; --accent-ink:#052018; --accent-soft:rgba(79,227,193,.14);
+  --accent:#4C8DFF; --accent-ink:#FFFFFF; --accent-soft:rgba(76,141,255,.16);
   --late:#FF6E7A; --late-soft:rgba(255,110,122,.14);
   --ok:#8CE99A; --ok-soft:rgba(140,233,154,.13);
   --c1:#7DB2FF; --c2:#FFD166; --c3:#79E0A8; --c4:#FF9F6E; --c5:#C3A2FF; --c0:#98A3C7;
-  --p1:#4FE3C1; --p2:#7DB2FF; --p3:#FFD166; --p4:#FF9F6E; --p5:#C3A2FF; --p6:#79E0A8;
+  --p1:#4C8DFF; --p2:#4FE3C1; --p3:#FFD166; --p4:#FF9F6E; --p5:#C3A2FF; --p6:#79E0A8;
   --shadow:0 18px 60px rgba(0,0,0,.55);
   --display:'Bricolage Grotesque','Avenir Next',system-ui,sans-serif;
   --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
@@ -35,11 +37,11 @@
     color-scheme:light;
     --bg:#F1F3F9; --surface:#FFFFFF; --surface-2:#F4F6FC; --surface-3:#E9EDF8; --line:#D9DEEE;
     --text:#111834; --muted:#56618A; --faint:#8A93B4;
-    --accent:#0E8C74; --accent-ink:#FFFFFF; --accent-soft:rgba(14,140,116,.11);
+    --accent:#0B57E8; --accent-ink:#FFFFFF; --accent-soft:rgba(11,87,232,.10);
     --late:#D2333F; --late-soft:rgba(210,51,63,.09);
     --ok:#1E8A46; --ok-soft:rgba(30,138,70,.1);
     --c1:#2A63C9; --c2:#9A7200; --c3:#1D8A57; --c4:#C4531A; --c5:#6E4BD0; --c0:#56618A;
-    --p1:#0E8C74; --p2:#2A63C9; --p3:#9A7200; --p4:#C4531A; --p5:#6E4BD0; --p6:#1D8A57;
+    --p1:#0B57E8; --p2:#0E8C74; --p3:#9A7200; --p4:#C4531A; --p5:#6E4BD0; --p6:#1D8A57;
     --shadow:0 18px 60px rgba(17,24,52,.18);
   }
 }
@@ -47,11 +49,11 @@
   color-scheme:light;
   --bg:#F1F3F9; --surface:#FFFFFF; --surface-2:#F4F6FC; --surface-3:#E9EDF8; --line:#D9DEEE;
   --text:#111834; --muted:#56618A; --faint:#8A93B4;
-  --accent:#0E8C74; --accent-ink:#FFFFFF; --accent-soft:rgba(14,140,116,.11);
+  --accent:#0B57E8; --accent-ink:#FFFFFF; --accent-soft:rgba(11,87,232,.10);
   --late:#D2333F; --late-soft:rgba(210,51,63,.09);
   --ok:#1E8A46; --ok-soft:rgba(30,138,70,.1);
   --c1:#2A63C9; --c2:#9A7200; --c3:#1D8A57; --c4:#C4531A; --c5:#6E4BD0; --c0:#56618A;
-  --p1:#0E8C74; --p2:#2A63C9; --p3:#9A7200; --p4:#C4531A; --p5:#6E4BD0; --p6:#1D8A57;
+  --p1:#0B57E8; --p2:#0E8C74; --p3:#9A7200; --p4:#C4531A; --p5:#6E4BD0; --p6:#1D8A57;
   --shadow:0 18px 60px rgba(17,24,52,.18);
 }
 :root[data-theme="dark"]{color-scheme:dark}
@@ -70,7 +72,8 @@ button{cursor:pointer}
 /* ---------- top ---------- */
 .top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px}
 .day{flex:1 1 260px;min-width:0}
-.eyebrow{font-family:var(--display);font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-size:.8rem}
+.eyebrow{font-family:var(--display);font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);font-size:.85rem;display:flex;align-items:center;gap:.5rem}
+.eyebrow .logo{width:1.5rem;height:1.5rem;border-radius:.4rem;display:block}
 h1{font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1;margin:.1em 0 0;text-wrap:balance;text-transform:capitalize;letter-spacing:-.02em}
 .motto{margin:.3rem 0 0;color:var(--muted);font-size:.9rem;font-style:italic}
 .stats{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:flex-end}
@@ -259,7 +262,7 @@ h2{font-family:var(--display);font-weight:700;font-size:1.2rem;letter-spacing:-.
 <div class="app">
   <header class="top">
     <div class="day">
-      <div class="eyebrow">Fil du jour</div>
+      <div class="eyebrow"><img src="icon.png" alt="" width="22" height="22" class="logo">Daydo</div>
       <h1 id="dateLabel">&nbsp;</h1>
       <p class="motto">Pense bien, tout ira bien</p>
     </div>
