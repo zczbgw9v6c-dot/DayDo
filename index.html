@@ -1,0 +1,1110 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0A0E1C">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230A0E1C'/%3E%3Cpath d='M18 34l10 10 18-22' fill='none' stroke='%234FE3C1' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' fill='%230A0E1C'/%3E%3Cpath d='M18 34l10 10 18-22' fill='none' stroke='%234FE3C1' stroke-width='7' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+</body>
+</html>
+<title>Fil du jour</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Manrope:wght@400;600;700;800&display=swap">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0A0E1C; --surface:#111730; --surface-2:#18203D; --surface-3:#1F2A4D; --line:#26305A;
+  --text:#EEF1FA; --muted:#98A3C7; --faint:#5F6A92;
+  --accent:#4FE3C1; --accent-ink:#052018; --accent-soft:rgba(79,227,193,.14);
+  --late:#FF6E7A; --late-soft:rgba(255,110,122,.14);
+  --ok:#8CE99A; --ok-soft:rgba(140,233,154,.13);
+  --c1:#7DB2FF; --c2:#FFD166; --c3:#79E0A8; --c4:#FF9F6E; --c5:#C3A2FF; --c0:#98A3C7;
+  --p1:#4FE3C1; --p2:#7DB2FF; --p3:#FFD166; --p4:#FF9F6E; --p5:#C3A2FF; --p6:#79E0A8;
+  --shadow:0 18px 60px rgba(0,0,0,.55);
+  --display:'Bricolage Grotesque','Avenir Next',system-ui,sans-serif;
+  --body:'Manrope',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:12px;
+}
+@media (prefers-color-scheme: light){
+  :root:not([data-theme="dark"]){
+    color-scheme:light;
+    --bg:#F1F3F9; --surface:#FFFFFF; --surface-2:#F4F6FC; --surface-3:#E9EDF8; --line:#D9DEEE;
+    --text:#111834; --muted:#56618A; --faint:#8A93B4;
+    --accent:#0E8C74; --accent-ink:#FFFFFF; --accent-soft:rgba(14,140,116,.11);
+    --late:#D2333F; --late-soft:rgba(210,51,63,.09);
+    --ok:#1E8A46; --ok-soft:rgba(30,138,70,.1);
+    --c1:#2A63C9; --c2:#9A7200; --c3:#1D8A57; --c4:#C4531A; --c5:#6E4BD0; --c0:#56618A;
+    --p1:#0E8C74; --p2:#2A63C9; --p3:#9A7200; --p4:#C4531A; --p5:#6E4BD0; --p6:#1D8A57;
+    --shadow:0 18px 60px rgba(17,24,52,.18);
+  }
+}
+:root[data-theme="light"]{
+  color-scheme:light;
+  --bg:#F1F3F9; --surface:#FFFFFF; --surface-2:#F4F6FC; --surface-3:#E9EDF8; --line:#D9DEEE;
+  --text:#111834; --muted:#56618A; --faint:#8A93B4;
+  --accent:#0E8C74; --accent-ink:#FFFFFF; --accent-soft:rgba(14,140,116,.11);
+  --late:#D2333F; --late-soft:rgba(210,51,63,.09);
+  --ok:#1E8A46; --ok-soft:rgba(30,138,70,.1);
+  --c1:#2A63C9; --c2:#9A7200; --c3:#1D8A57; --c4:#C4531A; --c5:#6E4BD0; --c0:#56618A;
+  --p1:#0E8C74; --p2:#2A63C9; --p3:#9A7200; --p4:#C4531A; --p5:#6E4BD0; --p6:#1D8A57;
+  --shadow:0 18px 60px rgba(17,24,52,.18);
+}
+:root[data-theme="dark"]{color-scheme:dark}
+
+html{font-size:clamp(15px, calc(.55vw + 8px), 24px)}
+body{margin:0;-webkit-text-size-adjust:100%}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font-family:var(--body);font-size:1rem;line-height:1.4;padding-inline:clamp(16px,1.6vw,36px);padding-block:calc(clamp(12px,1.2vw,22px) + env(safe-area-inset-top,0px)) calc(clamp(12px,1.2vw,22px) + env(safe-area-inset-bottom,0px))}
+*{box-sizing:border-box}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+
+.app{display:flex;flex-direction:column;gap:clamp(10px,1vw,18px);max-width:2400px;margin-inline:auto}
+
+/* ---------- top ---------- */
+.top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 24px}
+.day{flex:1 1 260px;min-width:0}
+.eyebrow{font-family:var(--display);font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-size:.8rem}
+h1{font-family:var(--display);font-weight:800;font-size:2.1rem;line-height:1;margin:.1em 0 0;text-wrap:balance;text-transform:capitalize;letter-spacing:-.02em}
+.motto{margin:.3rem 0 0;color:var(--muted);font-size:.9rem;font-style:italic}
+.stats{display:flex;flex-wrap:wrap;gap:6px 22px;align-items:flex-end}
+.stat{display:flex;align-items:baseline;gap:.4rem}
+.stat b{font-family:var(--display);font-weight:800;font-size:2rem;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.stat span{color:var(--muted);font-size:.85rem;line-height:1.15;max-width:7em}
+.stat.alert b{color:var(--late)}
+.stat.good b{color:var(--ok)}
+.right{display:flex;flex-direction:column;align-items:flex-end;gap:6px;margin-left:auto}
+.clock{font-family:var(--display);font-weight:800;font-size:2.6rem;line-height:.9;font-variant-numeric:tabular-nums;letter-spacing:-.03em}
+.actions{display:flex;gap:8px}
+.sync{font-size:.78rem;color:var(--faint)}
+
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.45em 1em;font-weight:700;font-size:.9rem;line-height:1.2}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.small{padding:.25em .75em;font-size:.8rem}
+.btn.ok{background:var(--ok-soft);border-color:transparent;color:var(--ok)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted)}
+.btn.ghost:hover{color:var(--text);border-color:var(--line)}
+.btn.danger{color:var(--late);border-color:transparent;background:transparent}
+.btn.danger.armed{background:var(--late);color:#fff}
+
+.banner{border:1px solid var(--late);background:var(--late-soft);color:var(--text);border-radius:var(--r);padding:.7em 1em}
+
+/* who chips */
+.who-bar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.who-bar .lbl{font-size:.8rem;color:var(--faint);font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-right:4px}
+.chip-p{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:.35em .9em;font-weight:700;font-size:.9rem;display:flex;align-items:center;gap:.4rem}
+.chip-p i{width:.55rem;height:.55rem;border-radius:50%;background:var(--pc,var(--muted))}
+.chip-p[aria-pressed="true"]{background:var(--text);color:var(--bg);border-color:var(--text)}
+.chip-p .n{font-size:.78rem;color:inherit;opacity:.65;font-variant-numeric:tabular-nums}
+
+/* ---------- layout ---------- */
+.board{display:grid;gap:clamp(10px,1vw,18px);grid-template-columns:1fr}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:clamp(12px,.9vw,18px);display:flex;flex-direction:column;min-height:0}
+.panel > header{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:.6rem}
+h2{font-family:var(--display);font-weight:700;font-size:1.2rem;letter-spacing:-.01em;margin:0}
+.count{color:var(--muted);font-size:.82rem;font-variant-numeric:tabular-nums}
+.scroll{overflow:auto;min-height:0;display:flex;flex-direction:column;gap:8px;padding-right:2px}
+.scroll > *{flex-shrink:0}
+.empty{color:var(--faint);padding:.8em .2em;font-size:.9rem}
+
+@media (min-width:1100px){
+  body{overflow:hidden}
+  .app{height:100%}
+  .board{flex:1;min-height:0;grid-template-columns:1.15fr 1fr 1fr;grid-template-rows:minmax(0,1.35fr) minmax(0,1fr)}
+  .p-tasks{grid-column:1 / -1}
+  .p-week{display:flex}
+}
+
+/* ---------- tasks by person ---------- */
+.people{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(15rem,1fr));min-height:0;flex:1}
+.person{background:var(--surface-2);border-radius:14px;padding:.7em .8em;display:flex;flex-direction:column;gap:6px;min-height:0;border-top:4px solid var(--pc,var(--line))}
+.person-h{display:flex;align-items:baseline;gap:.5rem}
+.person-h strong{font-family:var(--display);font-weight:800;font-size:1.25rem;letter-spacing:-.01em}
+.person-h .count{flex:1}
+.person-h .plus{background:none;border:0;color:var(--faint);font-size:1.2rem;line-height:1;padding:0 .2em}
+.person-h .plus:hover{color:var(--accent)}
+.plist{display:flex;flex-direction:column;gap:5px;overflow:auto;min-height:0}
+.plist > *{flex-shrink:0}
+.task{display:flex;align-items:flex-start;gap:.55rem;background:var(--surface);border-radius:9px;padding:.45em .55em;border-left:3px solid transparent}
+.task.late{border-left-color:var(--late);background:var(--late-soft)}
+.task.today{border-left-color:var(--pc,var(--accent))}
+.task .check{margin-top:.1rem}
+.task .t{background:none;border:0;text-align:left;padding:0;flex:1;min-width:0;overflow-wrap:anywhere;font-weight:600;font-size:.95rem;line-height:1.3}
+.task .t small{display:block;color:var(--muted);font-weight:400;font-size:.8rem}
+.task .t:hover{text-decoration:underline;text-underline-offset:3px}
+.task .r{display:flex;flex-direction:column;align-items:flex-end;gap:2px;flex:0 0 auto}
+.task .due{font-size:.78rem;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.task .due.late{color:var(--late);font-weight:800}
+.task .defer{background:none;border:0;color:var(--faint);font-size:.74rem;padding:0;white-space:nowrap}
+.task .defer:hover{color:var(--accent)}
+.task.done{opacity:.5}
+.task.done .t{text-decoration:line-through}
+.nothing{color:var(--faint);font-size:.88rem;padding:.4em .2em}
+
+.check{appearance:none;flex:0 0 auto;width:1.3rem;height:1.3rem;border:2px solid var(--muted);border-radius:6px;display:grid;place-items:center;background:transparent;margin:0}
+.check:checked{background:var(--ok);border-color:var(--ok)}
+.check:checked::after{content:"";width:.33rem;height:.62rem;border:solid var(--bg);border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-1px)}
+
+/* ---------- dossier rows ---------- */
+.row{position:relative;display:flex;align-items:stretch;background:var(--surface-2);border-radius:var(--r);overflow:hidden}
+.row::before{content:"";flex:0 0 5px;background:var(--c,var(--c0))}
+.row.late{background:var(--late-soft)}
+.row.late::before{background:var(--late)}
+.row.done{opacity:.55}
+.row .open{flex:1;min-width:0;text-align:left;background:none;border:0;padding:.6em .8em;display:flex;flex-direction:column;gap:.2rem}
+.row .side{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;padding-right:.6em}
+.line1{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;min-width:0}
+.who{font-family:var(--display);font-weight:700;font-size:1.15rem;line-height:1.15;letter-spacing:-.01em;overflow-wrap:anywhere}
+.meta{color:var(--muted);font-size:.85rem;overflow-wrap:anywhere}
+.what{font-size:.95rem}
+.tag{font-weight:800;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.15em .55em;border-radius:6px;background:var(--accent-soft);color:var(--accent);white-space:nowrap}
+.tag.late{background:var(--late);color:#fff}
+.tag.pose{background:var(--c,var(--accent));color:var(--bg)}
+.fiche{font-weight:800;font-size:.74rem;letter-spacing:.04em;color:var(--c,var(--muted));border:1px solid color-mix(in srgb, var(--c,var(--muted)) 45%, transparent);border-radius:6px;padding:.05em .45em;white-space:nowrap}
+.who-badge{font-size:.76rem;font-weight:700;color:var(--muted);background:var(--bg);border-radius:999px;padding:.1em .6em;white-space:nowrap}
+.steps-bar{display:flex;gap:3px;margin-top:.15rem;max-width:16rem}
+.steps-bar i{flex:1;height:4px;border-radius:3px;background:var(--line)}
+.steps-bar i.on{background:var(--c,var(--accent))}
+.subhead{font-weight:800;font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:.4rem 0 0;display:flex;justify-content:space-between}
+.subhead:first-child{margin-top:0}
+.mini{display:flex;align-items:center;gap:.55rem;background:var(--surface-2);border-radius:10px;padding:.45em .65em;border:0;text-align:left;width:100%}
+.mini .dot{width:.55rem;height:.55rem;border-radius:50%;background:var(--c,var(--c0));flex:0 0 auto}
+.mini .n{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.mini .d{color:var(--muted);font-size:.82rem;white-space:nowrap;font-variant-numeric:tabular-nums}
+.mini .d.late{color:var(--late);font-weight:700}
+
+/* ---------- week + activity ---------- */
+.p-week .inner{display:flex;flex-direction:column;gap:10px;min-height:0;flex:1}
+.p-week .inner > header{margin-bottom:0}
+.week{display:grid;grid-template-columns:repeat(auto-fill,minmax(5.6rem,1fr));gap:6px}
+.wday{background:var(--surface-2);border-radius:10px;padding:.45em .5em;display:flex;flex-direction:column;gap:4px;min-height:4.4rem}
+.wday.today{outline:2px solid var(--accent);outline-offset:-2px}
+.wday.weekend{background:transparent;border:1px dashed var(--line)}
+.wday h3{margin:0;font-weight:800;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:0 6px}
+.wday h3 small{font-weight:400;font-size:.72rem;letter-spacing:0;text-transform:none}
+.wday.today h3{color:var(--accent)}
+.chip{display:flex;align-items:center;gap:.4rem;background:var(--surface);border:0;border-radius:7px;padding:.2em .4em;text-align:left;font-size:.8rem;font-weight:700;min-width:0}
+.chip .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--c,var(--c0));flex:0 0 auto}
+.chip span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wtasks{font-size:.76rem;color:var(--muted)}
+.actlist{overflow:auto;min-height:0;flex:1}
+.act{display:flex;gap:.6rem;font-size:.82rem;padding:.2em 0;border-bottom:1px dashed var(--line)}
+.act:last-child{border-bottom:0}
+.act b{color:var(--faint);font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.act span{color:var(--muted);overflow-wrap:anywhere}
+
+@media (max-width:1099px){
+  .people{grid-template-columns:1fr}
+  .wday.weekend{display:none}
+  .stats{display:none}
+  .clock{display:none}
+  .right{align-items:flex-start;margin-left:0}
+  h1{font-size:1.8rem}
+  .task .defer{font-size:.8rem}
+  .actlist{max-height:12rem}
+}
+
+/* ---------- sheets ---------- */
+.scrim{position:fixed;inset:0;background:rgba(5,9,11,.55);z-index:20}
+.sheet{position:fixed;z-index:21;background:var(--surface);border:1px solid var(--line);box-shadow:var(--shadow);overflow:auto;
+  inset:auto 0 0 0;max-height:92%;border-radius:18px 18px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom,0px))}
+@media (min-width:760px){
+  .sheet{inset:clamp(20px,5vh,70px) auto auto 50%;transform:translateX(-50%);width:min(760px,calc(100% - 40px));max-height:calc(100% - 2*clamp(20px,5vh,70px));border-radius:18px;padding:24px 26px}
+}
+.sheet h3{font-family:var(--display);font-weight:800;font-size:1.6rem;letter-spacing:-.02em;margin:0 0 .8rem;line-height:1.05}
+.form{display:flex;flex-direction:column;gap:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:5px;font-size:.85rem;color:var(--muted);font-weight:700}
+.field input,.field select,.field textarea{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:.55em .7em;font-weight:400;font-size:1rem;color:var(--text);width:100%;min-width:0}
+.field textarea{resize:vertical}
+.stepsel{display:flex;flex-wrap:wrap;gap:6px}
+.stepsel button{border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:.35em .85em;font-size:.9rem}
+.stepsel button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:4px}
+.bar .spacer{flex:1}
+.journal{border-top:1px solid var(--line);padding-top:.7rem;font-size:.88rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.journal b{color:var(--text);font-weight:700;font-variant-numeric:tabular-nums}
+.qbox{width:100%;background:var(--bg);border:2px solid var(--accent);border-radius:14px;padding:.8em 1em;font-size:1.2rem;line-height:1.35;resize:vertical;min-height:4.6em}
+.hint{color:var(--faint);font-size:.85rem;margin:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;padding:3px;gap:3px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;border-radius:999px;padding:.35em .9em;font-size:.9rem;font-weight:700;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--surface-2);color:var(--text);box-shadow:inset 0 0 0 1px var(--line)}
+.seg button[hidden]{display:none}
+.preview{display:flex;flex-wrap:wrap;gap:8px}
+.pv{display:flex;flex-direction:column;background:var(--surface-2);border-radius:10px;padding:.4em .7em;min-width:6.5rem}
+.pv small{color:var(--faint);font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase}
+.pv span{font-weight:700}
+.pv.miss span{color:var(--faint);font-weight:400}
+.pv.change{background:var(--accent-soft)}
+
+.toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--text);color:var(--bg);padding:.6em 1.1em;border-radius:999px;font-weight:700;z-index:40;max-width:calc(100% - 32px);text-align:center}
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:10;box-shadow:var(--shadow);font-size:1.05rem;padding:.7em 1.3em}
+@media (min-width:1100px){.fab{display:none}}
+@media (prefers-reduced-motion:no-preference){
+  .task,.row,.mini,.chip{transition:background-color .2s}
+  .sheet{animation:rise .18s ease-out}
+  @keyframes rise{from{opacity:0;translate:0 12px}to{opacity:1;translate:0 0}}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="day">
+      <div class="eyebrow">Fil du jour</div>
+      <h1 id="dateLabel">&nbsp;</h1>
+      <p class="motto">Pense bien, tout ira bien</p>
+    </div>
+    <div class="stats" id="stats" aria-live="polite"></div>
+    <div class="right">
+      <div class="clock" id="clock">--:--</div>
+      <div class="actions">
+        <button class="btn" id="btnTv" type="button">Plein écran</button>
+        <button class="btn primary" id="btnAdd" type="button">+ Ajouter</button>
+      </div>
+      <div class="sync" id="sync">Connexion…</div>
+    </div>
+  </header>
+
+  <div class="who-bar" id="whoBar" role="group" aria-label="Afficher pour"></div>
+  <div class="banner" id="banner" hidden></div>
+
+  <main class="board">
+    <section class="panel p-tasks" aria-labelledby="hTasks">
+      <header><h2 id="hTasks">Tâches par personne</h2><span class="count" id="cTasks"></span></header>
+      <div class="people" id="people"></div>
+    </section>
+    <section class="panel p-today" aria-labelledby="hToday">
+      <header><h2 id="hToday">Dossiers du jour</h2><span class="count" id="cToday"></span></header>
+      <div class="scroll" id="today"></div>
+    </section>
+    <section class="panel p-cours" aria-labelledby="hCours">
+      <header><h2 id="hCours">Dossiers en cours</h2><span class="count" id="cCours"></span></header>
+      <div class="scroll" id="cours"></div>
+    </section>
+    <section class="panel p-week" aria-labelledby="hWeek">
+      <div class="inner">
+        <header><h2 id="hWeek">7 prochains jours</h2><span class="count">poses et tâches</span></header>
+        <div class="week" id="week"></div>
+        <header style="margin-top:.2rem"><h2 style="font-size:1rem">Dernières actions</h2><span class="count" id="cAct"></span></header>
+        <div class="actlist" id="act"></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<button class="btn primary fab" id="fab" type="button">+ Ajouter</button>
+<div class="scrim" id="scrim" hidden></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" hidden></div>
+<div class="toast" id="toast" role="status" hidden></div>
+<datalist id="dlPart"></datalist>
+<script>
+(() => {
+"use strict";
+
+/* ================= réglages par défaut (remplacés par config/reglages) ================= */
+const DEFAULTS = {
+  equipe: ["Eythan","Samuel","Josh","Katia","Vincent"],
+  fiches: [
+    {id:"171", code:"BAR-TH-171", label:"Pompe à chaleur", partenaire:"Nadav", couleur:"c1", mots:["pompe a chaleur","pac"]},
+    {id:"168", code:"168", label:"Panneaux solaires", partenaire:"Daniel", couleur:"c2", mots:["panneaux solaires","panneau solaire","photovoltaique"]},
+    {id:"110", code:"AGRI-EQ-110", label:"Séchage solaire", partenaire:"", couleur:"c3", mots:["sechage","sechoir"]},
+    {id:"108", code:"AGRI-EQ-108", label:"Thermitube", partenaire:"Dylan", couleur:"c4", mots:["thermitube","thermi tube"]},
+    {id:"127", code:"BAT-EQ-127", label:"Éclairage LED", partenaire:"Hillel", couleur:"c5", mots:["led","eclairage"]}
+  ],
+  partenaires: ["Dylan","Hillel","Nadav","Daniel","Ilan Zagdoun","Fab","Reakwon","Eyal"]
+};
+const ETAPES = [
+  {id:"nouveau",   label:"À traiter"},
+  {id:"devis",     label:"Devis envoyé"},
+  {id:"signe",     label:"Signé"},
+  {id:"programme", label:"Pose programmée"},
+  {id:"pose",      label:"Posé"},
+  {id:"cloture",   label:"Clôturé"}
+];
+const EIDX = Object.fromEntries(ETAPES.map((e,i)=>[e.id,i]));
+const JOURS = ["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+const JC = ["dim.","lun.","mar.","mer.","jeu.","ven.","sam."];
+const MOIS = ["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+const MOIS_N = ["janvier","fevrier","mars","avril","mai","juin","juillet","aout","septembre","octobre","novembre","decembre"];
+const MC = ["janv.","févr.","mars","avr.","mai","juin","juil.","août","sept.","oct.","nov.","déc."];
+
+/* ================= état ================= */
+let db = null;
+let dossiers = new Map();
+let taches = new Map();
+let reglages = DEFAULTS;
+let activite = [];
+const loaded = {d:false,t:false};
+let currentDay = "";
+let who = "";
+try{ who = localStorage.getItem("fdj-who") || ""; }catch(_){}
+
+/* ================= utilitaires ================= */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pad = n => String(n).padStart(2,"0");
+const ymd = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const fromYmd = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y,m-1,d); };
+const addDays = (d,n) => { const x = new Date(d.getFullYear(),d.getMonth(),d.getDate()); x.setDate(x.getDate()+n); return x; };
+const today = () => ymd(new Date());
+const diff = (a,b) => Math.round((fromYmd(a)-fromYmd(b))/864e5);
+const deacc = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"");
+const capFirst = s => s ? s.charAt(0).toUpperCase()+s.slice(1) : s;
+const capWords = s => String(s).toLowerCase().replace(/(^|[-\s'])(\p{L})/gu,(m,a,b)=>a+b.toUpperCase());
+const escRe = s => s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+const wordRe = (w,flags="u") => new RegExp(`(?<![\\p{L}\\d])${escRe(w)}(?![\\p{L}\\d])`, flags);
+
+function rel(s){
+  if(!s) return "";
+  const n = diff(s, today()), d = fromYmd(s);
+  if(n===0) return "aujourd'hui";
+  if(n===1) return "demain";
+  if(n===-1) return "hier";
+  if(n<0) return `il y a ${-n} j`;
+  if(n<7) return `${JC[d.getDay()]} ${d.getDate()}`;
+  return `${d.getDate()} ${MC[d.getMonth()]}`;
+}
+const equipe = () => (reglages.equipe && reglages.equipe.length) ? reglages.equipe : DEFAULTS.equipe;
+const fiches = () => (reglages.fiches && reglages.fiches.length) ? reglages.fiches : DEFAULTS.fiches;
+const partenaires = () => reglages.partenaires || DEFAULTS.partenaires;
+const ficheOf = id => fiches().find(f => f.id === id);
+const colorOf = id => { const f = ficheOf(id); return f && f.couleur ? `var(--${f.couleur})` : "var(--c0)"; };
+const ficheShort = id => { const f = ficheOf(id); return f ? f.code : (id || ""); };
+const clientName = d => d.client || "Client sans nom";
+const active = () => [...dossiers.values()].filter(d => d.etape !== "cloture");
+const personColor = n => { const i = equipe().indexOf(n); return i >= 0 ? `var(--p${(i % 6) + 1})` : "var(--muted)"; };
+const isMine = (obj, field) => !who || obj[field] === who;
+
+/* ================= rendu ================= */
+let raf = 0;
+function render(){ cancelAnimationFrame(raf); raf = requestAnimationFrame(renderNow); }
+
+function renderNow(){
+  const t = today(); currentDay = t;
+  const now = new Date();
+  $("#dateLabel").textContent = `${JOURS[now.getDay()]} ${now.getDate()} ${MOIS[now.getMonth()]}`;
+  renderWho();
+  renderStats(t);
+  renderPeople(t);
+  renderToday(t);
+  renderCours(t);
+  renderWeek(t);
+  renderAct();
+  $("#dlPart").innerHTML = partenaires().map(p=>`<option value="${esc(p)}">`).join("");
+  $("#sync").textContent = db ? ((loaded.d && loaded.t) ? "À jour en direct" : "Synchronisation…") : "Hors ligne";
+}
+
+function renderWho(){
+  const open = [...taches.values()].filter(x => !x.fait);
+  const names = equipe();
+  if(who && !names.includes(who)) who = "";
+  $("#whoBar").innerHTML = `<span class="lbl">Afficher</span>` +
+    `<button class="chip-p" data-who="" aria-pressed="${who===""}">Tout le monde <span class="n">${open.length}</span></button>` +
+    names.map(n => `<button class="chip-p" style="--pc:${personColor(n)}" data-who="${esc(n)}" aria-pressed="${who===n}"><i></i>${esc(n)} <span class="n">${open.filter(x=>x.pour===n).length}</span></button>`).join("");
+}
+
+function dossierItems(t){
+  const out = [];
+  for(const d of active()){
+    if(!isMine(d, "porteur")) continue;
+    const i = EIDX[d.etape] ?? 0;
+    let poseItem = false;
+    if(d.datePose && i < EIDX.pose){
+      if(d.datePose < t){ out.push({k:"poseLate", late:true, d, date:d.datePose, order:0}); poseItem = true; }
+      else if(d.datePose === t){ out.push({k:"pose", d, date:d.datePose, order:1}); poseItem = true; }
+    }
+    if(!poseItem && d.action && d.echeance && d.echeance <= t) out.push({k:"action", late:d.echeance < t, d, date:d.echeance, order:d.echeance < t ? 0 : 2});
+  }
+  out.sort((a,b)=> a.order-b.order || String(a.date).localeCompare(String(b.date)));
+  return out;
+}
+
+function renderStats(t){
+  const items = dossierItems(t);
+  const tasks = [...taches.values()].filter(x => isMine(x, "pour"));
+  const open = tasks.filter(x => !x.fait);
+  const late = items.filter(i => i.late).length + open.filter(x => x.echeance && x.echeance < t).length;
+  const poses = active().filter(d => isMine(d,"porteur") && d.datePose === t && (EIDX[d.etape]??0) < EIDX.pose).length;
+  const done = tasks.filter(x => x.fait && x.faitLe === t).length + [...dossiers.values()].filter(d => isMine(d,"porteur") && d.poseLe === t).length;
+  $("#stats").innerHTML = [
+    `<div class="stat"><b>${open.length}</b><span>tâche${open.length>1?"s":""} ouverte${open.length>1?"s":""}</span></div>`,
+    `<div class="stat ${late?"alert":""}"><b>${late}</b><span>en retard</span></div>`,
+    `<div class="stat"><b>${poses}</b><span>pose${poses>1?"s":""} aujourd'hui</span></div>`,
+    `<div class="stat ${done?"good":""}"><b>${done}</b><span>fait${done>1?"s":""} aujourd'hui</span></div>`
+  ].join("");
+}
+
+function taskRow(x, t){
+  const dos = x.dossierId && dossiers.get(x.dossierId);
+  const late = !x.fait && x.echeance && x.echeance < t;
+  const isToday = !x.fait && x.echeance === t;
+  return `<div class="task ${x.fait?"done":late?"late":isToday?"today":""}">
+    <input type="checkbox" class="check" id="chk-${esc(x.id)}" ${x.fait?"checked":""} data-toggle="${esc(x.id)}" aria-label="${x.fait?"Rouvrir":"Marquer comme fait"}">
+    <button class="t" data-open="t:${esc(x.id)}">${esc(x.texte)}${dos?`<small>${esc(clientName(dos))} · ${esc(ficheShort(dos.fiche))}</small>`:""}</button>
+    <div class="r">
+      ${x.echeance && !x.fait ? `<span class="due ${late?"late":""}">${esc(rel(x.echeance))}</span>` : ""}
+      ${x.fait ? "" : `<button class="defer" data-defer-t="${esc(x.id)}">→ demain</button>`}
+    </div>
+  </div>`;
+}
+
+function renderPeople(t){
+  const all = [...taches.values()];
+  const open = all.filter(x => !x.fait);
+  $("#cTasks").textContent = open.length ? `${open.length} ouverte${open.length>1?"s":""}` : (loaded.t ? "" : "chargement…");
+  let names = who ? [who] : [...equipe()];
+  const orphan = open.some(x => !x.pour || !equipe().includes(x.pour));
+  if(!who && orphan) names.push("");
+  const order = x => (x.echeance && x.echeance < t) ? 0 : (x.echeance === t ? 1 : 2);
+  $("#people").innerHTML = names.map(n => {
+    const mine = all.filter(x => n ? x.pour === n : (!x.pour || !equipe().includes(x.pour)));
+    const todo = mine.filter(x => !x.fait).sort((a,b)=> order(a)-order(b) || (a.echeance||"9").localeCompare(b.echeance||"9"));
+    const done = mine.filter(x => x.fait && x.faitLe === t);
+    const nd = n ? active().filter(d => d.porteur === n).length : 0;
+    const meta = [todo.length ? `${todo.length} à faire` : "", nd ? `${nd} dossier${nd>1?"s":""}` : ""].filter(Boolean).join(" · ");
+    return `<div class="person" style="--pc:${n?personColor(n):"var(--line)"}">
+      <div class="person-h"><strong>${esc(n || "Sans attribution")}</strong><span class="count">${esc(meta)}</span>
+        <button class="plus" data-newtask="${esc(n)}" aria-label="Nouvelle tâche pour ${esc(n||"quelqu'un")}">+</button></div>
+      <div class="plist">
+        ${todo.length ? todo.map(x => taskRow(x,t)).join("") : `<div class="nothing">Rien en attente</div>`}
+        ${done.map(x => taskRow(x,t)).join("")}
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function stepsBar(d){
+  const i = EIDX[d.etape] ?? 0;
+  return `<div class="steps-bar" aria-label="Étape ${i+1} sur ${ETAPES.length} : ${esc(ETAPES[i].label)}">${ETAPES.map((e,j)=>`<i class="${j<=i?"on":""}"></i>`).join("")}</div>`;
+}
+function dossierMeta(d){
+  const bits = [];
+  if(d.dept) bits.push(d.ville ? `${d.ville} (${d.dept})` : `Dépt ${d.dept}`); else if(d.ville) bits.push(d.ville);
+  if(d.partenaire) bits.push(d.partenaire);
+  if(d.porteur) bits.push(`dossier de ${d.porteur}`);
+  return bits.map(esc).join(" · ");
+}
+
+function renderToday(t){
+  const items = dossierItems(t);
+  const posed = [...dossiers.values()].filter(d => isMine(d,"porteur") && d.poseLe === t && (EIDX[d.etape]??0) >= EIDX.pose);
+  $("#cToday").textContent = items.length ? `${items.length} à suivre` : "";
+  if(!items.length && !posed.length){
+    $("#today").innerHTML = `<div class="empty">${loaded.d ? "Aucune pose ni action de dossier aujourd'hui." : "Chargement…"}</div>`;
+    return;
+  }
+  let h = items.map(it => {
+    const d = it.d, c = colorOf(d.fiche);
+    let tag, what, act;
+    if(it.k === "poseLate"){ tag = `<span class="tag late">Pose ${esc(rel(d.datePose))} · à confirmer</span>`; what = d.action ? `${esc(d.action)} · pose passée : confirme ou reprogramme` : "Pose passée : confirme qu'elle a eu lieu ou reprogramme."; act = `<button class="btn small ok" data-posed="${esc(d.id)}">Posé</button>`; }
+    else if(it.k === "pose"){ tag = `<span class="tag pose">Pose aujourd'hui</span>`; what = d.action ? esc(d.action) : ""; act = `<button class="btn small ok" data-posed="${esc(d.id)}">Posé</button>`; }
+    else { tag = `<span class="tag ${it.late?"late":""}">${it.late?`À faire · ${esc(rel(d.echeance))}`:"À faire"}</span>`; what = esc(d.action); act = `<button class="btn small ok" data-actdone="${esc(d.id)}">Fait</button>`; }
+    return `<article class="row ${it.late?"late":""}" style="--c:${c}">
+      <button class="open" data-open="d:${esc(d.id)}">
+        <div class="line1">${tag}<span class="fiche">${esc(ficheShort(d.fiche))}</span></div>
+        <div class="who">${esc(clientName(d))}</div>
+        ${what?`<div class="what">${what}</div>`:""}
+        <div class="meta">${dossierMeta(d)}</div>
+        ${stepsBar(d)}
+      </button>
+      <div class="side">${act}<button class="btn small ghost" data-defer-d="${esc(d.id)}">À demain</button></div>
+    </article>`;
+  }).join("");
+  if(posed.length){
+    h += `<div class="subhead"><span>Posé aujourd'hui</span><span>${posed.length}</span></div>`;
+    h += posed.map(d => `<article class="row done" style="--c:${colorOf(d.fiche)}"><button class="open" data-open="d:${esc(d.id)}"><div class="line1"><span class="tag pose">Posé</span><span class="fiche">${esc(ficheShort(d.fiche))}</span></div><div class="who">${esc(clientName(d))}</div></button></article>`).join("");
+  }
+  $("#today").innerHTML = h;
+}
+
+function renderCours(t){
+  const list = active().filter(d => isMine(d,"porteur"));
+  const clos = dossiers.size - active().length;
+  $("#cCours").textContent = list.length ? `${list.length} dossier${list.length>1?"s":""}` : "";
+  if(!list.length){ $("#cours").innerHTML = `<div class="empty">${loaded.d ? "Aucun dossier en cours. Dicte-en un avec « + Ajouter »." : "Chargement…"}</div>`; return; }
+  let h = "";
+  ETAPES.slice(0, -1).forEach(e => {
+    const g = list.filter(d => (d.etape||"nouveau") === e.id).sort((a,b)=>(a.datePose||a.echeance||"9").localeCompare(b.datePose||b.echeance||"9"));
+    if(!g.length) return;
+    h += `<div class="subhead"><span>${esc(e.label)}</span><span>${g.length}</span></div>`;
+    h += g.map(d => {
+      let dt = "", late = false;
+      if(d.datePose && e.id !== "pose"){ dt = `pose ${rel(d.datePose)}`; late = d.datePose < t; }
+      else if(d.echeance && d.action){ dt = rel(d.echeance); late = d.echeance < t; }
+      return `<button class="mini" style="--c:${colorOf(d.fiche)}" data-open="d:${esc(d.id)}">
+        <span class="dot"></span><span class="n">${esc(clientName(d))}${d.dept?` <span class="meta">${esc(d.dept)}</span>`:""}</span>
+        <span class="fiche">${esc(ficheShort(d.fiche))}</span>${d.porteur?`<span class="who-badge">${esc(d.porteur)}</span>`:""}
+        ${dt?`<span class="d ${late?"late":""}">${esc(dt)}</span>`:""}
+      </button>`;
+    }).join("");
+  });
+  if(clos) h += `<div class="hint" style="padding-top:.4rem">${clos} dossier${clos>1?"s":""} clôturé${clos>1?"s":""}, masqué${clos>1?"s":""}.</div>`;
+  $("#cours").innerHTML = h;
+}
+
+function renderWeek(t){
+  const base = fromYmd(t);
+  let h = "";
+  for(let i=0;i<7;i++){
+    const dd = addDays(base,i), s = ymd(dd), dow = dd.getDay();
+    const poses = active().filter(d => isMine(d,"porteur") && d.datePose === s).sort((a,b)=>clientName(a).localeCompare(clientName(b)));
+    const tk = [...taches.values()].filter(x => isMine(x,"pour") && !x.fait && x.echeance === s);
+    const label = i===0 ? "Auj." : `${JC[dow]} ${dd.getDate()}`;
+    h += `<div class="wday ${i===0?"today":""} ${(dow===0||dow===6)&&i!==0?"weekend":""}">
+      <h3><span>${esc(label)}</span>${poses.length?`<small>${poses.length} pose${poses.length>1?"s":""}</small>`:""}</h3>
+      ${poses.map(d=>`<button class="chip" style="--c:${colorOf(d.fiche)}" data-open="d:${esc(d.id)}"><span class="dot"></span><span>${esc(clientName(d))}</span></button>`).join("")}
+      ${tk.length?`<div class="wtasks">${tk.length} tâche${tk.length>1?"s":""}</div>`:""}
+    </div>`;
+  }
+  $("#week").innerHTML = h;
+}
+
+function renderAct(){
+  $("#cAct").textContent = activite.length ? "en direct" : "";
+  if(!activite.length){ $("#act").innerHTML = `<div class="empty">Chaque changement s'affichera ici.</div>`; return; }
+  $("#act").innerHTML = activite.slice().reverse().slice(0,30).map(a => { const d = new Date(a.t); const dd = ymd(d) === today() ? "" : `${pad(d.getDate())}/${pad(d.getMonth()+1)} `; return `<div class="act"><b>${dd}${pad(d.getHours())}:${pad(d.getMinutes())}</b><span>${esc(a.txt)}</span></div>`; }).join("");
+}
+
+/* ================= écriture ================= */
+function toast(msg){
+  const el = $("#toast"); el.textContent = msg; el.hidden = false;
+  clearTimeout(toast._t); toast._t = setTimeout(()=>{ el.hidden = true; }, 3200);
+}
+function writeError(e){
+  if(e && e.code === "invalid_argument") toast("Modification refusée : il faut un accès « Contributeur » à cette page.");
+  else if(e && e.code === "quota_exceeded") toast("La base est pleine : supprime d'anciens dossiers clôturés.");
+  else toast("Enregistrement impossible, réessaie dans un instant.");
+}
+function clean(o){ const c = {...o}; delete c.id; return c; }
+function newId(col){ return db ? db.collection(col).doc().id : "loc" + Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+async function setDoc(col, id, data, log){
+  if(!db){ toast("Pas de connexion aux données sur cet écran."); return false; }
+  try{ await db.collection(col).doc(id).set(clean(data)); if(log) logAct(log); return true; }
+  catch(e){ writeError(e); return false; }
+}
+async function removeDoc(col, id){
+  if(!db) return false;
+  try{ await db.collection(col).doc(id).delete(); return true; }
+  catch(e){ writeError(e); return false; }
+}
+async function logAct(txt){
+  try{ const items = activite.slice(-79); items.push({t:new Date().toISOString(), txt: (who ? who + " · " : "") + txt}); await db.doc("config/activite").set({items}); }catch(_){}
+}
+function withJournal(d, txt){
+  const j = Array.isArray(d.journal) ? d.journal.slice(-39) : [];
+  j.push({t:new Date().toISOString(), txt});
+  return j;
+}
+function applyEtape(d, next){
+  const prev = d.etape || "nouveau";
+  if(prev === next) return d;
+  const o = {...d, etape:next};
+  if(next === "pose" && !d.poseLe) o.poseLe = (d.datePose && d.datePose <= today()) ? d.datePose : today();
+  if((EIDX[next]??0) < EIDX.pose) o.poseLe = "";
+  o.journal = withJournal(d, `Étape : ${ETAPES[EIDX[prev]??0].label} → ${ETAPES[EIDX[next]].label}`);
+  return o;
+}
+async function markPosed(id){
+  const d = dossiers.get(id); if(!d) return;
+  let o = applyEtape(d, "pose");
+  if(o.action && o.echeance && o.echeance <= today()){ o.action = ""; o.echeance = ""; }
+  o.maj = new Date().toISOString();
+  if(await setDoc("dossiers", id, o, `${clientName(d)} : posé`)) toast(`${clientName(d)} : posé`);
+}
+async function actionDone(id){
+  const d = dossiers.get(id); if(!d) return;
+  const o = {...d, journal: withJournal(d, `Fait : ${d.action}`), action:"", echeance:"", maj:new Date().toISOString()};
+  if(await setDoc("dossiers", id, o, `${clientName(d)} : fait — ${d.action}`)) toast("Action faite");
+}
+async function setTaskDone(id, fait){
+  const x = taches.get(id); if(!x) return;
+  const o = {...x, fait, faitLe: fait ? today() : ""};
+  await setDoc("taches", id, o, `${fait ? "Fait" : "Rouvert"}${x.pour ? " (" + x.pour + ")" : ""} : ${x.texte}`);
+}
+async function deferTask(id){
+  const x = taches.get(id); if(!x) return;
+  const base = (x.echeance && x.echeance > today()) ? x.echeance : today();
+  const o = {...x, echeance: ymd(addDays(fromYmd(base),1))};
+  if(await setDoc("taches", id, o, `Reporté à ${rel(o.echeance)} : ${x.texte}`)) toast(`Reporté à ${rel(o.echeance)}`);
+}
+async function deferDossier(id){
+  const d = dossiers.get(id); if(!d) return;
+  const tm = ymd(addDays(fromYmd(today()),1));
+  const o = {...d, maj:new Date().toISOString()};
+  let what;
+  if(d.datePose && d.datePose <= today() && (EIDX[d.etape]??0) < EIDX.pose){ o.datePose = tm; what = "pose reprogrammée à demain"; o.journal = withJournal(d, "Pose reprogrammée à demain"); }
+  else { o.echeance = tm; what = `« ${d.action} » reporté à demain`; o.journal = withJournal(d, `Reporté à demain : ${d.action}`); }
+  if(await setDoc("dossiers", id, o, `${clientName(d)} : ${what}`)) toast("Reporté à demain");
+}
+
+/* ================= feuilles (édition) ================= */
+let sheetClose = null;
+function openSheet(html, onMount){
+  const s = $("#sheet");
+  s.innerHTML = html; s.hidden = false; $("#scrim").hidden = false;
+  sheetClose = () => { s.hidden = true; $("#scrim").hidden = true; s.innerHTML = ""; sheetClose = null; };
+  onMount && onMount(s);
+}
+function closeSheet(){ sheetClose && sheetClose(); }
+$("#scrim").addEventListener("click", closeSheet);
+document.addEventListener("keydown", e => {
+  if(e.key === "Escape" && sheetClose){ closeSheet(); return; }
+  const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "");
+  if(!typing && !sheetClose && (e.key === "n" || e.key === "+")){ e.preventDefault(); openQuick(); }
+});
+const opts = (arr, sel, empty) => (empty!=null?`<option value="">${esc(empty)}</option>`:"") + arr.map(v => { const [val,lab] = Array.isArray(v)?v:[v,v]; return `<option value="${esc(val)}" ${val===sel?"selected":""}>${esc(lab)}</option>`; }).join("");
+
+function armDelete(btn, run){
+  btn.addEventListener("click", async () => {
+    if(btn.classList.contains("armed")){ await run(); return; }
+    btn.classList.add("armed"); btn.textContent = "Confirmer la suppression";
+    setTimeout(()=>{ btn.classList.remove("armed"); btn.textContent = "Supprimer"; }, 4000);
+  });
+}
+
+function editDossier(id, preset){
+  const isNew = !id;
+  const d = isNew ? {client:"",dept:"",ville:"",fiche:fiches()[0].id,partenaire:"",porteur:"",etape:"nouveau",datePose:"",action:"",echeance:"",note:"",journal:[], ...(preset||{})} : {...dossiers.get(id)};
+  if(!isNew && !dossiers.has(id)) return;
+  const journal = (d.journal||[]).slice().reverse().map(j => { const dt = new Date(j.t); return `<div><b>${pad(dt.getDate())}/${pad(dt.getMonth()+1)} ${pad(dt.getHours())}:${pad(dt.getMinutes())}</b> · ${esc(j.txt)}</div>`; }).join("");
+  const linked = isNew ? [] : [...taches.values()].filter(x => x.dossierId === id && !x.fait);
+  openSheet(`
+    <form class="form" id="fD" novalidate>
+      <h3>${isNew ? "Nouveau dossier" : esc(clientName(d))}</h3>
+      <div class="grid">
+        <label class="field">Client<input id="d_client" value="${esc(d.client)}" autocomplete="off" placeholder="M. Dupont"></label>
+        <label class="field">Département<input id="d_dept" value="${esc(d.dept)}" maxlength="3" inputmode="numeric" placeholder="74"></label>
+        <label class="field">Ville<input id="d_ville" value="${esc(d.ville)}" autocomplete="off"></label>
+        <label class="field">Fiche<select id="d_fiche">${opts(fiches().map(f=>[f.id, `${f.code} · ${f.label}`]), d.fiche, "—")}</select></label>
+        <label class="field">Partenaire<input id="d_part" value="${esc(d.partenaire)}" list="dlPart" autocomplete="off"></label>
+        <label class="field">Dossier de<select id="d_porteur">${opts(equipe(), d.porteur, "—")}</select></label>
+      </div>
+      <div class="field">Étape<div class="stepsel" id="d_etape">${ETAPES.map(e=>`<button type="button" data-e="${e.id}" aria-pressed="${e.id===(d.etape||"nouveau")}">${esc(e.label)}</button>`).join("")}</div></div>
+      <div class="grid">
+        <label class="field">Date de pose<input type="date" id="d_pose" value="${esc(d.datePose)}"></label>
+        <label class="field">Prochaine action<input id="d_action" value="${esc(d.action)}" autocomplete="off" placeholder="Relancer pour la signature"></label>
+        <label class="field">Pour le<input type="date" id="d_ech" value="${esc(d.echeance)}"></label>
+      </div>
+      <label class="field">Note<textarea id="d_note" rows="3">${esc(d.note)}</textarea></label>
+      ${linked.length?`<div class="journal"><strong style="color:var(--text)">Tâches liées</strong>${linked.map(x=>`<div>${esc(x.texte)}${x.pour?` · ${esc(x.pour)}`:""}${x.echeance?` · ${esc(rel(x.echeance))}`:""}</div>`).join("")}</div>`:""}
+      ${journal?`<div class="journal"><strong style="color:var(--text)">Historique</strong>${journal}</div>`:""}
+      <div class="bar">
+        ${isNew?"":`<button type="button" class="btn danger" id="d_del">Supprimer</button><button type="button" class="btn" id="d_task">+ Tâche liée</button>`}
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-close>Annuler</button>
+        <button type="submit" class="btn primary">Enregistrer</button>
+      </div>
+    </form>`, s => {
+      let etape = d.etape || "nouveau";
+      s.querySelectorAll("#d_etape button").forEach(b => b.addEventListener("click", () => {
+        etape = b.dataset.e; s.querySelectorAll("#d_etape button").forEach(x => x.setAttribute("aria-pressed", String(x === b)));
+      }));
+      s.querySelector("#d_fiche").addEventListener("change", e => {
+        const f = ficheOf(e.target.value), p = s.querySelector("#d_part");
+        if(f && f.partenaire && !p.value) p.value = f.partenaire;
+      });
+      s.querySelector("[data-close]").addEventListener("click", closeSheet);
+      const del = s.querySelector("#d_del");
+      if(del) armDelete(del, async () => { if(await removeDoc("dossiers", id)){ logAct(`Dossier supprimé : ${clientName(d)}`); closeSheet(); toast("Dossier supprimé"); } });
+      const lt = s.querySelector("#d_task");
+      if(lt) lt.addEventListener("click", () => editTask(null, {dossierId:id, pour:d.porteur||"", echeance:today()}));
+      s.querySelector("#fD").addEventListener("submit", async e => {
+        e.preventDefault();
+        const v = k => s.querySelector(k).value.trim();
+        let o = {...d, client:v("#d_client"), dept:v("#d_dept").toUpperCase(), ville:v("#d_ville"), fiche:v("#d_fiche"), partenaire:v("#d_part"), porteur:v("#d_porteur"), datePose:v("#d_pose"), action:v("#d_action"), echeance:v("#d_ech"), note:v("#d_note")};
+        if(o.action && !o.echeance) o.echeance = today();
+        if(isNew){ o.etape = etape; if(etape === "pose") o.poseLe = o.datePose || today(); o.journal = [{t:new Date().toISOString(), txt:"Dossier créé"}]; o.cree = new Date().toISOString(); }
+        else {
+          if(d.datePose !== o.datePose && o.datePose) o.journal = withJournal(o, `Date de pose : ${rel(o.datePose)} (${o.datePose.split("-").reverse().join("/")})`);
+          o = applyEtape(o, etape);
+        }
+        o.maj = new Date().toISOString();
+        const nid = isNew ? newId("dossiers") : id;
+        if(await setDoc("dossiers", nid, o, `${isNew ? "Nouveau dossier" : "Dossier modifié"} : ${o.client || "sans nom"} (${ficheShort(o.fiche)})`)){ closeSheet(); toast(isNew ? "Dossier ajouté" : "Enregistré"); }
+      });
+      if(isNew) s.querySelector("#d_client").focus();
+    });
+}
+
+function editTask(id, preset){
+  const isNew = !id;
+  if(!isNew && !taches.has(id)) return;
+  const x = isNew ? {texte:"",pour:who||"",echeance:today(),dossierId:"",note:"",fait:false,faitLe:"", ...(preset||{})} : {...taches.get(id)};
+  const dos = active().map(d => [d.id, `${clientName(d)} · ${ficheShort(d.fiche)}`]);
+  openSheet(`
+    <form class="form" id="fT" novalidate>
+      <h3>${isNew ? "Nouvelle tâche" : "Tâche"}</h3>
+      <label class="field">Tâche<input id="t_texte" value="${esc(x.texte)}" autocomplete="off" placeholder="Rappeler Daniel pour la régie"></label>
+      <div class="grid">
+        <label class="field">Pour<select id="t_pour">${opts(equipe(), x.pour, "—")}</select></label>
+        <label class="field">Échéance<input type="date" id="t_ech" value="${esc(x.echeance)}"></label>
+        <label class="field">Dossier lié<select id="t_dos">${opts(dos, x.dossierId, "Aucun")}</select></label>
+      </div>
+      <label class="field">Note<textarea id="t_note" rows="2">${esc(x.note)}</textarea></label>
+      ${x.source?`<p class="hint">Dicté : « ${esc(x.source)} »</p>`:""}
+      <div class="bar">
+        ${isNew?"":`<button type="button" class="btn danger" id="t_del">Supprimer</button>`}
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-close>Annuler</button>
+        <button type="submit" class="btn primary">Enregistrer</button>
+      </div>
+    </form>`, s => {
+      s.querySelector("[data-close]").addEventListener("click", closeSheet);
+      const del = s.querySelector("#t_del");
+      if(del) armDelete(del, async () => { if(await removeDoc("taches", id)){ logAct(`Tâche supprimée : ${x.texte}`); closeSheet(); toast("Tâche supprimée"); } });
+      s.querySelector("#fT").addEventListener("submit", async e => {
+        e.preventDefault();
+        const v = k => s.querySelector(k).value.trim();
+        if(!v("#t_texte")){ s.querySelector("#t_texte").focus(); toast("Écris la tâche avant d'enregistrer."); return; }
+        const o = {...x, texte:capFirst(v("#t_texte")), pour:v("#t_pour"), echeance:v("#t_ech"), dossierId:v("#t_dos"), note:v("#t_note")};
+        if(isNew) o.cree = new Date().toISOString();
+        if(await setDoc("taches", isNew ? newId("taches") : id, o, `${isNew ? "Nouvelle tâche" : "Tâche modifiée"}${o.pour ? " pour " + o.pour : ""} : ${o.texte}`)){ closeSheet(); toast(isNew ? "Tâche ajoutée" : "Enregistré"); }
+      });
+      if(isNew) s.querySelector("#t_texte").focus();
+    });
+}
+
+/* ================= dictée : lecture de la phrase ================= */
+const MOIS_RE = "janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[uû]t|septembre|octobre|novembre|d[ée]cembre";
+const fixYear = (d, t, explicit) => (!explicit && d < addDays(t,-60)) ? new Date(d.getFullYear()+1, d.getMonth(), d.getDate()) : d;
+const DATE_RULES = [
+  {re:new RegExp(`(?<!\\p{L})(?:le\\s+)?(\\d{1,2}|1er|premier)\\s+(${MOIS_RE})(?:\\s+(\\d{4}))?(?!\\p{L})`,"giu"),
+   fn:(a,t)=>{ const j = /^\d+$/.test(a[1]) ? +a[1] : 1; const m = MOIS_N.indexOf(deacc(a[2].toLowerCase())); if(m<0||j<1||j>31) return null; return fixYear(new Date(a[3]?+a[3]:t.getFullYear(), m, j), t, !!a[3]); }},
+  {re:/(?<![\d\/])(?:le\s+)?(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?(?![\d\/])/gi,
+   fn:(a,t)=>{ const j=+a[1], m=+a[2]-1; if(m<0||m>11||j<1||j>31) return null; const y = a[3] ? (+a[3]<100 ? 2000 + +a[3] : +a[3]) : t.getFullYear(); return fixYear(new Date(y,m,j), t, !!a[3]); }},
+  {re:/(?<!\p{L})apr[eè]s[- ]demain(?!\p{L})/giu, fn:(a,t)=>addDays(t,2)},
+  {re:/(?<!\p{L})aujourd'?\s?hui(?!\p{L})/giu, fn:(a,t)=>t},
+  {re:/(?<!\p{L})demain(?!\p{L})/giu, fn:(a,t)=>addDays(t,1)},
+  {re:/(?<!\p{L})(?:ce\s+|le\s+)?(lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)(\s+prochain)?(?!\p{L})/giu,
+   fn:(a,t)=>{ const target = JOURS.indexOf(a[1].toLowerCase()); let n = (target - t.getDay() + 7) % 7; if(a[2] && n===0) n = 7; return addDays(t,n); }}
+];
+const STAGE_RULES = [
+  ["cloture",   /cl[ôo]tur|dossier complet|factur[ée]/u],
+  ["pose",      /(?<!\p{L})(posé(e|s|es)?|installé(e|s|es)?|terminé(e|s|es)?|fini(e|s)?)(?!\p{L})/u],
+  ["programme", /programm|planifi|date de pose|(?<!\p{L})pose (le|pr[ée]vue|aujourd|demain|lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche|ce)|installation (le|pr[ée]vue|aujourd|demain)/u],
+  ["signe",     /(?<!\p{L})signé(e|s|es)?(?!\p{L})|signature|devis signe(?!\p{L})/u],
+  ["devis",     /devis (envoy|parti|transmis)|envoy[ée] le devis|envoi du devis/u]
+];
+const CLIENT_RE = /(?<!\p{L})(m\.|mr\.?|monsieur|mme\.?|madame|mlle|mademoiselle|soci[ée]t[ée]|sarl|sas|eurl|entreprise|ets|[ée]tablissements?|chez|client|cliente)\s+([\p{L}'-]+)(?:\s+([\p{L}'-]+))?/iu;
+const CLIENT_PREFIX = {"m.":"M.","mr":"M.","mr.":"M.","monsieur":"M.","mme":"Mme","mme.":"Mme","madame":"Mme","mlle":"Mlle","mademoiselle":"Mlle","societe":"Société","sarl":"SARL","sas":"SAS","eurl":"EURL","entreprise":"Entreprise","ets":"Ets","etablissement":"Éts","etablissements":"Éts","chez":"","client":"","cliente":""};
+const STOP = new Set(["dans","le","la","les","du","de","des","pour","a","à","au","aux","dossier","fiche","date","pose","en","et","qui","rdv","sur","avec","devis","est","l","d","son","sa","ses","qu","c","il","elle"]);
+const ACTION_RE = /(?<!\p{L})(suivre|rappeler|relancer|envoyer|r[ée]cup[ée]rer|appeler|confirmer|v[ée]rifier|pr[ée]parer|faire signer|d[ée]poser|commander|planifier|programmer)(?!\p{L})([^,.;!?]*)/iu;
+
+function nameTokens(name){
+  return deacc(String(name||"").toLowerCase()).split(/[\s'-]+/).filter(w => w.length >= 3 && !["mme","mlle","societe","sarl","eurl","entreprise","ets","client"].includes(w));
+}
+
+function parse(raw){
+  const s = String(raw||"").replace(/[’`]/g,"'").replace(/\s+/g," ").trim();
+  const R = {raw:s, type:"tache", fiche:"", ficheExplicit:false, client:"", dept:"", partenaire:"", porteur:"", etape:"", date:"", datePose:"", echeance:"", action:"", pour:"", texte:"", match:""};
+  if(!s) return R;
+  const t0 = fromYmd(today());
+  let w = s;
+  for(const rule of DATE_RULES){
+    w = w.replace(rule.re, (...a) => { if(!R.date){ const d = rule.fn(a, t0); if(d) R.date = ymd(d); } return " "; });
+  }
+  const lo = s.toLowerCase(), na = deacc(lo), wl = w.toLowerCase(), wna = deacc(wl);
+
+  for(const f of fiches()){ if(new RegExp(`(?<!\\d)${escRe(f.id)}(?!\\d)`).test(wna)){ R.fiche = f.id; R.ficheExplicit = true; break; } }
+  if(!R.fiche){ outer: for(const f of fiches()) for(const m of (f.mots||[])) if(wordRe(deacc(m.toLowerCase())).test(na)){ R.fiche = f.id; R.ficheExplicit = true; break outer; } }
+
+  let m = wna.match(/(?:dans le|dans l'|departement|dept|dep\.?)\s*(\d{2,3}|2a|2b)(?!\d)/);
+  if(m) R.dept = m[1].toUpperCase();
+  else {
+    const re = /(?<![\d\/])(\d{2,3})(?![\d\/])(?!\s*(?:chantiers?|dossiers?|poses?|m2|m²|kw|€|euros?|h(?![a-z])|heures?|ans?|%|panneaux|clients?|mn|min))/g; let x;
+    while((x = re.exec(wna))){ const v = x[1]; if(fiches().some(f => f.id === v)) continue; const n = +v; if((v.length===2 && n>=1 && n<=95) || (n>=971 && n<=976)){ R.dept = v; break; } }
+  }
+
+  let best = -1;
+  for(const [id, re] of STAGE_RULES) if(re.test(lo) && EIDX[id] > best) best = EIDX[id];
+  if(best >= 0) R.etape = ETAPES[best].id;
+
+  const team = equipe();
+  const found = team.filter(n => wordRe(deacc(n.toLowerCase())).test(na));
+  for(const n of team){
+    const nn = escRe(deacc(n.toLowerCase()));
+    if(new RegExp(`(?:dossiers?|clients?|leads?|affaires?)\\s+(?:de|d')\\s*${nn}(?!\\p{L})|(?:apport|ramen|amen|trouv)\\S*\\s+par\\s+${nn}(?!\\p{L})|(?<!\\p{L})${nn}\\s+l'a\\s+(?:sign|apport|ramen|trouv|eu)`,"u").test(na)) { R.porteur = n; break; }
+  }
+  for(const n of team){
+    const nn = escRe(deacc(n.toLowerCase()));
+    if(new RegExp(`(?<!\\p{L})(?:pour|a|demande a|demander a|dis a|dire a)\\s+${nn}(?!\\p{L})`,"u").test(na)) { R.pour = n; break; }
+  }
+  if(!R.pour && /(?<!\p{L})pour moi(?!\p{L})/u.test(na)) R.pour = team.find(n => /eythan/i.test(n)) || "";
+  if(!R.porteur && found[0]) R.porteur = found[0];
+  if(!R.pour && found[0]) R.pour = found[0];
+
+  for(const p of partenaires()){ const first = deacc(p.split(" ")[0].toLowerCase()); if(first.length>=3 && wordRe(first).test(na)){ R.partenaire = p; break; } }
+
+  m = w.match(CLIENT_RE);
+  if(m){
+    const w1 = m[2], w2 = m[3];
+    if(!STOP.has(w1.toLowerCase()) && !team.some(n => n.toLowerCase() === w1.toLowerCase())){
+      let name = capWords(w1);
+      if(w2 && !STOP.has(w2.toLowerCase())) name += " " + capWords(w2);
+      const pre = CLIENT_PREFIX[deacc(m[1].toLowerCase())] ?? "";
+      R.client = (pre + " " + name).trim();
+    }
+  }
+
+  const tokenHits = d => nameTokens(d.client).some(tok => wordRe(tok).test(na));
+  const hit = active().find(tokenHits);
+  if(hit) R.match = hit.id;
+
+  m = w.match(ACTION_RE);
+  if(m) R.action = capFirst((m[1] + m[2]).replace(/\s+/g," ").replace(/\s+(le|la|pour|de)$/i,"").trim());
+
+  if(R.match && !(R.ficheExplicit && R.fiche !== dossiers.get(R.match).fiche)) R.type = "maj";
+  else if(R.ficheExplicit || R.client || R.etape) R.type = "dossier";
+  else R.type = "tache";
+
+  let tx = w;
+  if(R.pour) tx = tx.replace(new RegExp(`(?<!\\p{L})(?:pour|à|a)\\s+${escRe(R.pour)}(?!\\p{L})`,"iu"), " ");
+  tx = tx.replace(/\s+/g," ").replace(/\s+([,.;])/g,"$1").replace(/([,;])\s*[,;]+/g,"$1").replace(/^[\s,.;:-]+|[\s,.;:-]+$/g,"");
+  R.texte = capFirst(tx);
+  return R;
+}
+
+function resolve(R, type){
+  const t = today();
+  const out = {...R, type};
+  const poseWord = /pose|install|programm|planifi|chantier/.test(deacc(R.raw.toLowerCase()));
+  out.datePose = ""; out.echeance = "";
+  if(R.date){
+    if(type !== "tache" && (poseWord || R.etape === "programme" || R.etape === "pose")) out.datePose = R.date;
+    else out.echeance = R.date;
+  }
+  if(type === "tache" && !out.echeance) out.echeance = t;
+  if(type === "tache" && !out.pour && who) out.pour = who;
+  if(type !== "tache" && R.action && !out.echeance) out.echeance = t;
+  if(type === "dossier"){
+    if(!out.etape) out.etape = out.datePose ? "programme" : "nouveau";
+    if(!out.fiche) out.fiche = "";
+    if(!R.partenaire){ const f = ficheOf(out.fiche); out.partenaire = f ? f.partenaire : ""; }
+  }
+  if(type === "maj"){
+    const d = dossiers.get(R.match);
+    if(d && out.datePose && !out.etape && (EIDX[d.etape]??0) < EIDX.programme) out.etape = "programme";
+  }
+  return out;
+}
+
+function previewHtml(P){
+  const cell = (label, val, cls="") => `<div class="pv ${val?cls:"miss"}"><small>${esc(label)}</small><span>${esc(val || "—")}</span></div>`;
+  if(!P.raw) return `<p class="hint">Exemples : « M. Vaupoussin dans le 74, dossier 171, pose programmée aujourd'hui, dossier de Vincent » · « Vaupoussin posé » · « Rappeler Daniel pour la régie, pour Josh, demain ».</p>`;
+  if(P.type === "tache"){
+    const dos = P.match && dossiers.get(P.match);
+    return cell("Tâche", P.texte) + cell("Pour", P.pour) + cell("Échéance", P.echeance ? rel(P.echeance) : "") + (dos ? cell("Dossier lié", clientName(dos)) : "");
+  }
+  if(P.type === "maj"){
+    const d = dossiers.get(P.match); if(!d) return "";
+    let h = cell("Mise à jour de", clientName(d), "change");
+    if(P.etape && P.etape !== d.etape) h += cell("Étape", `${ETAPES[EIDX[d.etape]??0].label} → ${ETAPES[EIDX[P.etape]].label}`, "change");
+    if(P.datePose) h += cell("Date de pose", rel(P.datePose), "change");
+    if(P.action) h += cell("Prochaine action", `${P.action} · ${rel(P.echeance)}`, "change");
+    if(P.porteur && P.porteur !== d.porteur) h += cell("Dossier de", P.porteur, "change");
+    if(P.dept && P.dept !== d.dept) h += cell("Département", P.dept, "change");
+    if(P.partenaire && P.partenaire !== d.partenaire) h += cell("Partenaire", P.partenaire, "change");
+    if(h.split('class="pv').length <= 2) h += `<p class="hint">Aucun changement reconnu : la phrase sera ajoutée à l'historique du dossier.</p>`;
+    return h;
+  }
+  const f = ficheOf(P.fiche);
+  return cell("Client", P.client) + cell("Dépt", P.dept) + cell("Fiche", f ? f.code : "") + cell("Partenaire", P.partenaire) + cell("Dossier de", P.porteur)
+    + cell("Étape", ETAPES[EIDX[P.etape]??0].label) + cell("Pose", P.datePose ? rel(P.datePose) : "") + (P.action ? cell("Action", `${P.action} · ${rel(P.echeance)}`) : "");
+}
+
+async function saveParsed(P){
+  const now = new Date().toISOString(), t = today();
+  if(P.type === "tache"){
+    const o = {texte:P.texte || P.raw, pour:P.pour, echeance:P.echeance, dossierId:P.match || "", note:"", fait:false, faitLe:"", source:P.raw, cree:now};
+    return (await setDoc("taches", newId("taches"), o, `Nouvelle tâche${o.pour ? " pour " + o.pour : ""} : ${o.texte}`)) && "Tâche ajoutée";
+  }
+  if(P.type === "dossier"){
+    const o = {client:P.client, dept:P.dept, ville:"", fiche:P.fiche, partenaire:P.partenaire, porteur:P.porteur, etape:P.etape, datePose:P.datePose,
+      poseLe: P.etape === "pose" ? (P.datePose || t) : "", action:P.action, echeance:P.echeance, note:"", journal:[{t:now, txt:`Créé : « ${P.raw} »`}], cree:now, maj:now};
+    return (await setDoc("dossiers", newId("dossiers"), o, `Nouveau dossier : ${o.client || "sans nom"} (${ficheShort(o.fiche)})`)) && "Dossier ajouté";
+  }
+  const d = dossiers.get(P.match); if(!d) return false;
+  let o = {...d, journal: withJournal(d, `« ${P.raw} »`)};
+  if(P.datePose) o.datePose = P.datePose;
+  if(P.action){ o.action = P.action; o.echeance = P.echeance; }
+  if(P.porteur) o.porteur = P.porteur;
+  if(P.dept) o.dept = P.dept;
+  if(P.partenaire) o.partenaire = P.partenaire;
+  if(P.etape) o = applyEtape(o, P.etape);
+  if(P.etape === "pose" && !P.action && o.echeance && o.echeance <= t){ o.action = ""; o.echeance = ""; }
+  o.maj = now;
+  return (await setDoc("dossiers", d.id, o, `${clientName(d)} : ${P.raw}`)) && `${clientName(d)} mis à jour`;
+}
+
+function openQuick(){
+  let forced = "", P = resolve(parse(""), "tache");
+  openSheet(`
+    <div class="form">
+      <h3>Qu'est-ce qui se passe ?</h3>
+      <textarea class="qbox" id="q_text" rows="2" placeholder="Dicte ou écris : M. Vaupoussin dans le 74, dossier 171, pose aujourd'hui, dossier de Vincent"></textarea>
+      <p class="hint">Sur Mac : deux appuis sur fn pour dicter. Sur iPhone : le micro du clavier. Entrée pour enregistrer.</p>
+      <div class="seg" id="q_type" role="group" aria-label="Type">
+        <button type="button" data-t="dossier">Nouveau dossier</button>
+        <button type="button" data-t="maj">Mise à jour</button>
+        <button type="button" data-t="tache">Tâche</button>
+      </div>
+      <div class="preview" id="q_prev"></div>
+      <div class="bar">
+        <button type="button" class="btn" id="q_edit">Compléter à la main</button>
+        <span class="spacer"></span>
+        <button type="button" class="btn" data-close>Annuler</button>
+        <button type="button" class="btn primary" id="q_save">Enregistrer</button>
+      </div>
+    </div>`, s => {
+      const ta = s.querySelector("#q_text");
+      const update = () => {
+        const R = parse(ta.value);
+        let type = forced || R.type;
+        if(type === "maj" && !R.match) type = R.type === "maj" ? "dossier" : R.type;
+        P = resolve(R, type);
+        s.querySelectorAll("#q_type button").forEach(b => {
+          b.setAttribute("aria-pressed", String(b.dataset.t === type));
+          if(b.dataset.t === "maj"){ b.hidden = !R.match; if(R.match) b.textContent = `Mise à jour · ${clientName(dossiers.get(R.match))}`; }
+        });
+        s.querySelector("#q_prev").innerHTML = previewHtml(P);
+      };
+      ta.addEventListener("input", update);
+      s.querySelectorAll("#q_type button").forEach(b => b.addEventListener("click", () => { forced = b.dataset.t; update(); ta.focus(); }));
+      const save = async () => {
+        if(!P.raw){ ta.focus(); return; }
+        const msg = await saveParsed(P);
+        if(msg){ closeSheet(); toast(msg); }
+      };
+      s.querySelector("#q_save").addEventListener("click", save);
+      ta.addEventListener("keydown", e => { if(e.key === "Enter" && !e.shiftKey){ e.preventDefault(); save(); } });
+      s.querySelector("[data-close]").addEventListener("click", closeSheet);
+      s.querySelector("#q_edit").addEventListener("click", () => {
+        if(P.type === "tache") editTask(null, {texte:P.texte, pour:P.pour, echeance:P.echeance, dossierId:P.match||"", source:P.raw});
+        else if(P.type === "maj") editDossier(P.match);
+        else editDossier(null, {client:P.client, dept:P.dept, fiche:P.fiche, partenaire:P.partenaire, porteur:P.porteur, etape:P.etape, datePose:P.datePose, action:P.action, echeance:P.echeance, note:P.raw});
+      });
+      update(); ta.focus();
+    });
+}
+
+/* ================= clics ================= */
+document.addEventListener("click", e => {
+  const el = e.target.closest("[data-open],[data-posed],[data-actdone],[data-newtask],[data-defer-t],[data-defer-d],[data-who]");
+  if(!el) return;
+  if(el.dataset.who !== undefined){ who = el.dataset.who; try{ localStorage.setItem("fdj-who", who); }catch(_){} render(); }
+  else if(el.dataset.deferT) deferTask(el.dataset.deferT);
+  else if(el.dataset.deferD) deferDossier(el.dataset.deferD);
+  else if(el.dataset.open){ const [k,id] = [el.dataset.open.slice(0,1), el.dataset.open.slice(2)]; k === "d" ? editDossier(id) : editTask(id); }
+  else if(el.dataset.posed) markPosed(el.dataset.posed);
+  else if(el.dataset.actdone) actionDone(el.dataset.actdone);
+  else if(el.dataset.newtask !== undefined) editTask(null, {pour:el.dataset.newtask || who || "", echeance:today()});
+});
+document.addEventListener("change", e => {
+  const el = e.target;
+  if(el.dataset && el.dataset.toggle) setTaskDone(el.dataset.toggle, el.checked);
+});
+$("#btnAdd").addEventListener("click", openQuick);
+$("#fab").addEventListener("click", openQuick);
+
+/* plein écran + écran allumé */
+let lock = null;
+async function keepAwake(){ try{ if(navigator.wakeLock && !lock){ lock = await navigator.wakeLock.request("screen"); lock.addEventListener("release", () => { lock = null; }); } }catch(_){} }
+$("#btnTv").addEventListener("click", async () => {
+  keepAwake();
+  try{
+    if(document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  }catch(_){ toast("Le plein écran n'est pas disponible ici : utilise celui du navigateur."); }
+});
+document.addEventListener("fullscreenchange", () => { $("#btnTv").textContent = document.fullscreenElement ? "Quitter le plein écran" : "Plein écran"; });
+document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible" && document.fullscreenElement) keepAwake(); });
+
+/* horloge */
+function tick(){
+  const n = new Date();
+  $("#clock").textContent = `${pad(n.getHours())}:${pad(n.getMinutes())}`;
+  if(ymd(n) !== currentDay) render();
+}
+setInterval(tick, 10000);
+
+/* ================= connexion aux données (Supabase) ================= */
+const SB_URL = "https://zsdozcqilsnwdrnjetbr.supabase.co";
+const SB_KEY = "sb_publishable_PX-wR4B5kjMvi-VAnfCY2w_B0ocvwL0";
+const TABLES = {dossiers:"fdj_dossiers", taches:"fdj_taches"};
+const snake = k => k.replace(/[A-Z]/g, c => "_" + c.toLowerCase());
+const camel = k => k.replace(/_([a-z])/g, (m,c) => c.toUpperCase());
+const toRow = o => Object.fromEntries(Object.entries(o).map(([k,v]) => [snake(k), v]));
+const fromRow = r => Object.fromEntries(Object.entries(r).map(([k,v]) => [camel(k), v]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+
+function makeDb(sb){
+  const listeners = {};
+  const fetchTable = async col => {
+    const {data, error} = await sb.from(TABLES[col]).select("*");
+    if(error) throw error;
+    const docs = data.map(r => { const o = fromRow(r); return {id:o.id, exists:true, data:()=>o}; });
+    (listeners[col]||[]).forEach(fn => fn({docs}));
+  };
+  const fetchConfig = async id => {
+    const {data} = await sb.from("fdj_config").select("data").eq("id", id).maybeSingle();
+    (listeners["config/"+id]||[]).forEach(fn => fn({exists:!!data, data:()=>data ? data.data : undefined}));
+  };
+  const refresh = () => { Object.keys(TABLES).forEach(c => fetchTable(c).catch(()=>{})); ["reglages","activite"].forEach(i => fetchConfig(i).catch(()=>{})); };
+  sb.channel("fdj").on("postgres_changes", {event:"*", schema:"public"}, () => refresh()).subscribe();
+  setInterval(refresh, 30000);
+  document.addEventListener("visibilitychange", () => { if(document.visibilityState === "visible") refresh(); });
+  const wrap = e => { const err = new Error(e.message || "erreur"); err.code = /permission|policy|row-level/i.test(e.message||"") ? "invalid_argument" : "unavailable"; return err; };
+  return {
+    collection: col => ({
+      onSnapshot: (fn, onErr) => { (listeners[col] ||= []).push(fn); fetchTable(col).catch(e => onErr && onErr(wrap(e))); return () => {}; },
+      doc: id => {
+        const did = id || uid();
+        return {
+          id: did,
+          set: async data => { const {error} = await sb.from(TABLES[col]).upsert({...toRow(data), id:did, maj:new Date().toISOString()}); if(error) throw wrap(error); fetchTable(col).catch(()=>{}); },
+          delete: async () => { const {error} = await sb.from(TABLES[col]).delete().eq("id", did); if(error) throw wrap(error); fetchTable(col).catch(()=>{}); }
+        };
+      }
+    }),
+    doc: path => {
+      const id = path.split("/")[1];
+      return {
+        onSnapshot: (fn, onErr) => { (listeners[path] ||= []).push(fn); fetchConfig(id).catch(e => onErr && onErr(wrap(e))); return () => {}; },
+        set: async data => { const {error} = await sb.from("fdj_config").upsert({id, data, maj:new Date().toISOString()}); if(error) throw wrap(error); fetchConfig(id).catch(()=>{}); }
+      };
+    }
+  };
+}
+
+async function connect(){
+  try{
+    if(!window.supabase) throw new Error("lib");
+    db = makeDb(window.supabase.createClient(SB_URL, SB_KEY));
+  }catch(_){
+    db = null;
+    const b = $("#banner"); b.hidden = false;
+    b.textContent = "Connexion aux données impossible. Vérifie ta connexion internet puis recharge la page.";
+    render(); return;
+  }
+  const lost = () => { loaded.d = loaded.t = false; render(); };
+  db.collection("dossiers").onSnapshot(snap => { dossiers = new Map(snap.docs.map(d => [d.id, {id:d.id, ...d.data()}])); loaded.d = true; render(); }, lost);
+  db.collection("taches").onSnapshot(snap => { taches = new Map(snap.docs.map(d => [d.id, {id:d.id, ...d.data()}])); loaded.t = true; render(); }, lost);
+  db.doc("config/activite").onSnapshot(s => { activite = s.exists && Array.isArray(s.data().items) ? s.data().items : []; render(); }, () => {});
+  db.doc("config/reglages").onSnapshot(s => { reglages = s.exists ? {...DEFAULTS, ...s.data()} : DEFAULTS; render(); }, () => {});
+  render();
+}
+
+tick(); render(); connect();
+})();
+</script>
+</body>
+</html>
