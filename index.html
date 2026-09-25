@@ -198,6 +198,17 @@ h2{font-family:var(--display);font-weight:700;font-size:1.2rem;letter-spacing:-.
 .chip .dot{width:.5rem;height:.5rem;border-radius:50%;background:var(--c,var(--c0));flex:0 0 auto}
 .chip span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wtasks{font-size:.76rem;color:var(--muted)}
+.wday{cursor:pointer;text-align:left;border:0;font:inherit;color:inherit;width:100%}
+.wday:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.wt{display:flex;gap:.3rem;align-items:baseline;font-size:.76rem;min-width:0}
+.wt i{width:.45rem;height:.45rem;border-radius:50%;background:var(--pc,var(--muted));flex:0 0 auto;align-self:center}
+.wt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
+.wmore{font-size:.72rem;color:var(--accent);font-weight:700}
+.later{font-weight:800;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--faint);padding:.35rem .2rem .05rem}
+.dayblock{display:flex;flex-direction:column;gap:6px}
+.dayblock h4{margin:.4rem 0 0;font-family:var(--display);font-weight:700;font-size:1.05rem;display:flex;align-items:center;gap:.45rem}
+.dayblock h4 i{width:.6rem;height:.6rem;border-radius:50%;background:var(--pc,var(--muted))}
+.daynav{display:flex;gap:6px;align-items:center}
 .actlist{overflow:auto;min-height:0;flex:1}
 .act{display:flex;gap:.6rem;font-size:.82rem;padding:.2em 0;border-bottom:1px dashed var(--line)}
 .act:last-child{border-bottom:0}
@@ -402,6 +413,7 @@ function renderNow(){
   renderCours(t);
   renderWeek(t);
   renderAct();
+  refreshDay();
   $("#dlPart").innerHTML = partenaires().map(p=>`<option value="${esc(p)}">`).join("");
   $("#sync").textContent = db ? ((loaded.d && loaded.t) ? "À jour en direct" : "Synchronisation…") : "Hors ligne";
 }
@@ -455,7 +467,7 @@ function taskRow(x, t){
     <button class="t" data-open="t:${esc(x.id)}">${esc(x.texte)}${dos?`<small>${esc(clientName(dos))} · ${esc(ficheShort(dos.fiche))}</small>`:""}</button>
     <div class="r">
       ${x.echeance && !x.fait ? `<span class="due ${late?"late":""}">${esc(rel(x.echeance))}</span>` : ""}
-      ${x.fait ? "" : `<button class="defer" data-defer-t="${esc(x.id)}">→ demain</button>`}
+      ${x.fait ? "" : `<button class="defer" data-defer-t="${esc(x.id)}">${x.echeance && x.echeance > t ? "+1 jour" : "→ demain"}</button>`}
     </div>
   </div>`;
 }
@@ -478,7 +490,9 @@ function renderPeople(t){
       <div class="person-h"><strong>${esc(n || "Sans attribution")}</strong><span class="count">${esc(meta)}</span>
         <button class="plus" data-newtask="${esc(n)}" aria-label="Nouvelle tâche pour ${esc(n||"quelqu'un")}">+</button></div>
       <div class="plist">
-        ${todo.length ? todo.map(x => taskRow(x,t)).join("") : `<div class="nothing">Rien en attente</div>`}
+        ${todo.length ? (() => { const now = todo.filter(x => !x.echeance || x.echeance <= t), later = todo.filter(x => x.echeance && x.echeance > t);
+            return (now.length ? now.map(x => taskRow(x,t)).join("") : `<div class="nothing">Rien pour aujourd'hui</div>`) + (later.length ? `<div class="later">À venir · ${later.length}</div>` + later.map(x => taskRow(x,t)).join("") : ""); })()
+          : `<div class="nothing">Rien en attente</div>`}
         ${done.map(x => taskRow(x,t)).join("")}
       </div>
     </div>`;
@@ -562,10 +576,12 @@ function renderWeek(t){
     const poses = active().filter(d => isMine(d,"porteur") && d.datePose === s).sort((a,b)=>clientName(a).localeCompare(clientName(b)));
     const tk = [...taches.values()].filter(x => isMine(x,"pour") && !x.fait && x.echeance === s);
     const label = i===0 ? "Auj." : `${JC[dow]} ${dd.getDate()}`;
-    h += `<div class="wday ${i===0?"today":""} ${(dow===0||dow===6)&&i!==0?"weekend":""}">
+    const shown = tk.slice(0, 3);
+    h += `<div class="wday ${i===0?"today":""} ${(dow===0||dow===6)&&i!==0?"weekend":""}" role="button" tabindex="0" data-day="${s}" aria-label="Voir le programme du ${esc(label)}">
       <h3><span>${esc(label)}</span>${poses.length?`<small>${poses.length} pose${poses.length>1?"s":""}</small>`:""}</h3>
       ${poses.map(d=>`<button class="chip" style="--c:${colorOf(d.fiche)}" data-open="d:${esc(d.id)}"><span class="dot"></span><span>${esc(clientName(d))}</span></button>`).join("")}
-      ${tk.length?`<div class="wtasks">${tk.length} tâche${tk.length>1?"s":""}</div>`:""}
+      ${shown.map(x=>`<div class="wt" style="--pc:${personColor(x.pour)}"><i></i><span>${esc(x.texte)}</span></div>`).join("")}
+      ${tk.length>3?`<div class="wmore">+ ${tk.length-3} autre${tk.length-3>1?"s":""}</div>`:""}
     </div>`;
   }
   $("#week").innerHTML = h;
@@ -661,6 +677,7 @@ function closeSheet(){ sheetClose && sheetClose(); }
 $("#scrim").addEventListener("click", closeSheet);
 document.addEventListener("keydown", e => {
   if(e.key === "Escape" && sheetClose){ closeSheet(); return; }
+  if((e.key === "Enter" || e.key === " ") && e.target.dataset && e.target.dataset.day){ e.preventDefault(); openDay(e.target.dataset.day); return; }
   const typing = /^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement?.tagName || "");
   if(!typing && !sheetClose && (e.key === "n" || e.key === "+")){ e.preventDefault(); openQuick(); }
 });
@@ -999,10 +1016,47 @@ function openQuick(){
     });
 }
 
+/* ================= programme d'un jour ================= */
+let openDayStr = "";
+function dayTitle(s){ const d = fromYmd(s); const r = diff(s, today()); const base = `${capFirst(JOURS[d.getDay()])} ${d.getDate()} ${MOIS[d.getMonth()]}`; return r===0 ? `Aujourd'hui · ${base}` : r===1 ? `Demain · ${base}` : base; }
+function dayBody(s){
+  const t = today();
+  const poses = active().filter(d => isMine(d,"porteur") && d.datePose === s);
+  const acts = active().filter(d => isMine(d,"porteur") && d.action && d.echeance === s && d.datePose !== s);
+  const tk = [...taches.values()].filter(x => isMine(x,"pour") && x.echeance === s && (!x.fait || x.faitLe === t));
+  let h = "";
+  if(poses.length || acts.length){
+    h += `<div class="dayblock"><h4>Dossiers</h4>` + [...poses, ...acts].map(d => `<button class="mini" style="--c:${colorOf(d.fiche)}" data-open="d:${esc(d.id)}"><span class="dot"></span><span class="n">${esc(clientName(d))}</span><span class="fiche">${esc(ficheShort(d.fiche))}</span><span class="d">${d.datePose === s ? "pose" : esc(d.action)}</span></button>`).join("") + `</div>`;
+  }
+  const names = [...equipe(), ""];
+  names.forEach(n => {
+    const mine = tk.filter(x => n ? x.pour === n : (!x.pour || !equipe().includes(x.pour)));
+    if(!mine.length) return;
+    h += `<div class="dayblock" style="--pc:${n?personColor(n):"var(--line)"}"><h4><i></i>${esc(n || "Sans attribution")}</h4>${mine.map(x => taskRow(x,t)).join("")}</div>`;
+  });
+  return h || `<p class="empty">Rien de prévu ce jour-là.</p>`;
+}
+function openDay(s){
+  openDayStr = s;
+  openSheet(`<div class="form">
+      <div class="bar" style="margin:0"><h3 style="margin:0;flex:1">${esc(dayTitle(s))}</h3>
+        <div class="daynav"><button class="btn small" data-dnav="-1" aria-label="Jour précédent">‹</button><button class="btn small" data-dnav="1" aria-label="Jour suivant">›</button></div></div>
+      <div id="dayBody">${dayBody(s)}</div>
+      <div class="bar"><button type="button" class="btn" data-daytask="${s}">+ Tâche pour ce jour</button><span class="spacer"></span><button type="button" class="btn primary" data-close>Fermer</button></div>
+    </div>`, sh => {
+      sh.querySelector("[data-close]").addEventListener("click", closeSheet);
+      sh.querySelectorAll("[data-dnav]").forEach(b => b.addEventListener("click", () => openDay(ymd(addDays(fromYmd(openDayStr), +b.dataset.dnav)))));
+      sh.querySelector("[data-daytask]").addEventListener("click", () => { const d = openDayStr; editTask(null, {pour: who || "", echeance: d}); });
+    });
+  const prev = sheetClose; sheetClose = () => { openDayStr = ""; prev && prev(); };
+}
+function refreshDay(){ const b = document.getElementById("dayBody"); if(openDayStr && b) b.innerHTML = dayBody(openDayStr); }
+
 /* ================= clics ================= */
 document.addEventListener("click", e => {
-  const el = e.target.closest("[data-open],[data-posed],[data-actdone],[data-newtask],[data-defer-t],[data-defer-d],[data-who]");
+  const el = e.target.closest("[data-open],[data-posed],[data-actdone],[data-newtask],[data-defer-t],[data-defer-d],[data-who],[data-day]");
   if(!el) return;
+  if(el.dataset.day){ openDay(el.dataset.day); return; }
   if(el.dataset.who !== undefined){ who = el.dataset.who; try{ localStorage.setItem("fdj-who", who); }catch(_){} render(); }
   else if(el.dataset.deferT) deferTask(el.dataset.deferT);
   else if(el.dataset.deferD) deferDossier(el.dataset.deferD);
