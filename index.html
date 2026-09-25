@@ -6,6 +6,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#080C18">
+<meta http-equiv="Cache-Control" content="no-cache">
 <link rel="icon" type="image/png" href="icon-512.png">
 <link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-title" content="Daydo">
@@ -21,7 +22,7 @@
 :root{
   color-scheme:dark;
   --bg:#080C18; --surface:#111730; --surface-2:#18203D; --surface-3:#1F2A4D; --line:#26305A;
-  --text:#EEF1FA; --muted:#98A3C7; --faint:#5F6A92;
+  --text:#EEF1FA; --muted:#A3ADCD; --faint:#6F7AA3;
   --accent:#4C8DFF; --accent-ink:#FFFFFF; --accent-soft:rgba(76,141,255,.16);
   --late:#FF6E7A; --late-soft:rgba(255,110,122,.14);
   --ok:#8CE99A; --ok-soft:rgba(140,233,154,.13);
@@ -36,7 +37,7 @@
   :root:not([data-theme="dark"]){
     color-scheme:light;
     --bg:#F1F3F9; --surface:#FFFFFF; --surface-2:#F4F6FC; --surface-3:#E9EDF8; --line:#D9DEEE;
-    --text:#111834; --muted:#56618A; --faint:#8A93B4;
+    --text:#111834; --muted:#4B5680; --faint:#6F7A9E;
     --accent:#0B57E8; --accent-ink:#FFFFFF; --accent-soft:rgba(11,87,232,.10);
     --late:#D2333F; --late-soft:rgba(210,51,63,.09);
     --ok:#1E8A46; --ok-soft:rgba(30,138,70,.1);
@@ -48,7 +49,7 @@
 :root[data-theme="light"]{
   color-scheme:light;
   --bg:#F1F3F9; --surface:#FFFFFF; --surface-2:#F4F6FC; --surface-3:#E9EDF8; --line:#D9DEEE;
-  --text:#111834; --muted:#56618A; --faint:#8A93B4;
+  --text:#111834; --muted:#4B5680; --faint:#6F7A9E;
   --accent:#0B57E8; --accent-ink:#FFFFFF; --accent-soft:rgba(11,87,232,.10);
   --late:#D2333F; --late-soft:rgba(210,51,63,.09);
   --ok:#1E8A46; --ok-soft:rgba(30,138,70,.1);
@@ -199,7 +200,8 @@ h2{font-family:var(--display);font-weight:700;font-size:1.2rem;letter-spacing:-.
 .chip span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .wtasks{font-size:.76rem;color:var(--muted)}
 .wday{cursor:pointer;text-align:left;border:0;font:inherit;color:inherit;width:100%}
-.wday:hover{box-shadow:inset 0 0 0 1px var(--accent)}
+.wday:hover,.wday:focus-visible{box-shadow:inset 0 0 0 1px var(--accent)}
+.wday .hint-tap{font-size:.7rem;color:var(--accent);font-weight:700;margin-top:auto;padding-top:.2rem}
 .wt{display:flex;gap:.3rem;align-items:baseline;font-size:.76rem;min-width:0}
 .wt i{width:.45rem;height:.45rem;border-radius:50%;background:var(--pc,var(--muted));flex:0 0 auto;align-self:center}
 .wt span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted)}
@@ -222,7 +224,14 @@ h2{font-family:var(--display);font-weight:700;font-size:1.2rem;letter-spacing:-.
   .clock{display:none}
   .right{align-items:flex-start;margin-left:0}
   h1{font-size:1.8rem}
-  .task .defer{font-size:.8rem}
+  .task .defer{font-size:.85rem;padding:.3em .5em;border:1px solid var(--line);border-radius:999px;color:var(--muted)}
+  .task{padding:.6em .6em}
+  .check{width:1.6rem;height:1.6rem}
+  .wday{min-height:0;padding:.7em .8em}
+  .wday h3{font-size:.9rem}
+  .wt{font-size:.88rem}
+  .week{grid-template-columns:1fr 1fr}
+  .btn.small{padding:.4em .9em;font-size:.88rem}
   .actlist{max-height:12rem}
 }
 
@@ -415,7 +424,7 @@ function renderNow(){
   renderAct();
   refreshDay();
   $("#dlPart").innerHTML = partenaires().map(p=>`<option value="${esc(p)}">`).join("");
-  $("#sync").textContent = db ? ((loaded.d && loaded.t) ? "À jour en direct" : "Synchronisation…") : "Hors ligne";
+  $("#sync").textContent = (db ? ((loaded.d && loaded.t) ? "À jour en direct" : "Synchronisation…") : "Hors ligne") + " · v4";
 }
 
 function renderWho(){
@@ -582,6 +591,7 @@ function renderWeek(t){
       ${poses.map(d=>`<button class="chip" style="--c:${colorOf(d.fiche)}" data-open="d:${esc(d.id)}"><span class="dot"></span><span>${esc(clientName(d))}</span></button>`).join("")}
       ${shown.map(x=>`<div class="wt" style="--pc:${personColor(x.pour)}"><i></i><span>${esc(x.texte)}</span></div>`).join("")}
       ${tk.length>3?`<div class="wmore">+ ${tk.length-3} autre${tk.length-3>1?"s":""}</div>`:""}
+      ${(tk.length||poses.length)?`<div class="hint-tap">Voir le programme ›</div>`:""}
     </div>`;
   }
   $("#week").innerHTML = h;
@@ -1056,7 +1066,7 @@ function refreshDay(){ const b = document.getElementById("dayBody"); if(openDayS
 document.addEventListener("click", e => {
   const el = e.target.closest("[data-open],[data-posed],[data-actdone],[data-newtask],[data-defer-t],[data-defer-d],[data-who],[data-day]");
   if(!el) return;
-  if(el.dataset.day){ openDay(el.dataset.day); return; }
+  if(el.dataset.day !== undefined){ openDay(el.dataset.day); return; }
   if(el.dataset.who !== undefined){ who = el.dataset.who; try{ localStorage.setItem("fdj-who", who); }catch(_){} render(); }
   else if(el.dataset.deferT) deferTask(el.dataset.deferT);
   else if(el.dataset.deferD) deferDossier(el.dataset.deferD);
